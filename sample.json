@@ -1,0 +1,14 @@
+{
+    "RIAGENDR": ,  // Integer value
+    "RIDAGEYR": , //  Integer value
+    "RACE": ,    //   Integer
+    "COUPLE": , //    INTEGER
+    "SMOKER": ,
+    "EDUC": ,
+    "COVERED": , 
+    "INSURANCE":,
+    "FAT":,
+    "Abdobesity":,
+    "TOTAL_ACCULTURATION_SCORE":,
+    "HTN":
+}   
