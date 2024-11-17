@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # FastAPI backend URL
-FASTAPI_URL = "https://et2dm-bcc233253de3.herokuapp.com/predict"  # Update if running FastAPI on a different host/port
+FASTAPI_URL = "https://still-hollows-08006-91be346bd4c8.herokuapp.com/predict"  # Update if running FastAPI on a different host/port
 
 st.title('Early Diabetes Prediction!')
 
