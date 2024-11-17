@@ -1,0 +1,10 @@
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+__pycache__/
+.env
+.vscode/
+*.tar.gz
+*.whl
