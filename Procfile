@@ -1,1 +1,1 @@
-web: streamlit run app.py --server.port $PORT --server.address 0.0.0.0
+web: gunicorn -w 4 -k uvicorn.workers.UvicornWorker app/server:app
