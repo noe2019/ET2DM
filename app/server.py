@@ -5,31 +5,41 @@ import numpy as np
 import pandas as pd
 
 # Load the model and scaler
-model = joblib.load("app/eo_best_model.joblib")
-scaler = joblib.load("app/scaler.joblib")  # Load scaler from a .pkl file
+model = joblib.load("app/adaboost_best_model.pkl")
+scaler = joblib.load("app/pipeline.pkl")  # Load scaler from a .pkl file
 
 # Class names for the prediction
-class_names = np.array(["No risk", "Early diabetes risk"])
+class_names = np.array(["No Parkinson disease", "Parkinson disease"])
 
 # Define the FastAPI app
 app = FastAPI()
 
-# Define expected input data schema with constrained integers
+# Define expected input data schema with thresholds for validation
 class PredictionRequest(BaseModel):
-    RIDAGEYR: confloat(ge=21.0, le=120.0)  # Example: Age from 0 to 120
-    RACE: conint(ge=1, le=4)  # Example: Race category, 1 to 5
-    EDUC: conint(ge=1, le=3)  # Example: Education level, 1 to 5
-    COUPLE: conint(ge=1, le=3)  # Example: 0 or 1 for couple status
-    TOTAL_ACCULTURATION_SCORE_v2: conint(ge=1, le=3)  # Example: Score from 0 to 100
-    FAT: conint(ge=1, le=3)  # Example: FAT score from 0 to 100
-    POVERTIES: conint(ge=0, le=1)  # Example: Poverty level, 0 to 5
-    HTN: conint(ge=0, le=1)  # Example: 0 or 1 for hypertension
-    RIAGENDR: conint(ge=1, le=2)  # Example: 1 or 2 for gender
-    SMOKER: conint(ge=0, le=1)  # Example: 0 or 1 for smoker status
+    UPDRS: confloat(ge=0, le=108)  # Unified Parkinson's Disease Rating Scale (0-108)
+    FunctionalAssessment: conint(ge=0, le=100)  # Percent functional capacity (0-100%)
+    Tremor: confloat(ge=0, le=4)  # Tremor severity score (0-4)
+    MoCA: conint(ge=0, le=30)  # Montreal Cognitive Assessment (0-30)
+    PosturalInstability: confloat(ge=0, le=4)  # Postural instability score (0-4)
+    Bradykinesia: confloat(ge=0, le=4)  # Bradykinesia severity score (0-4)
+    EducationLevel: conint(ge=0, le=20)  # Years of education (0-20)
+    Diabetes: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
+    Depression: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
+    Hypertension: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
+    Gender: conint(ge=0, le=1)  # Binary (0: Female, 1: Male)
+    BMI: confloat(ge=10, le=60)  # Body Mass Index (10-60)
+    Stroke: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
+    SleepDisorders: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
+    DiastolicBP: confloat(ge=40, le=120)  # Diastolic blood pressure (40-120 mmHg)
+    Constipation: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
+    Rigidity: confloat(ge=0, le=4)  # Rigidity severity score (0-4)
+    CholesterolHDL: confloat(ge=20, le=100)  # HDL cholesterol level (20-100 mg/dL)
+    FamilyHistoryParkinsons: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
+    TraumaticBrainInjury: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
 
 @app.get('/')
 def read_root():
-    return {'message': 'Early diabetes model API'}
+    return {'message': 'Parkinson Disease prediction API'}
 
 @app.post('/predict')
 def predict(data: PredictionRequest):
