@@ -1,35 +1,44 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, conint, confloat
+from mangum import Mangum
+from pydantic import BaseModel, Field
 import joblib
 import numpy as np
 import pandas as pd
-
-# Load the model and scaler
-model = joblib.load("app/eo_best_model.joblib")
-scaler = joblib.load("app/scaler.joblib")  # Load scaler from a .pkl file
-
-# Class names for the prediction
-class_names = np.array(["No risk", "Early diabetes risk"])
+import os
 
 # Define the FastAPI app
 app = FastAPI()
+handler = Mangum(app)
 
-# Define expected input data schema with constrained integers
+# Load the model and scaler with fallback error handling
+try:
+    model = joblib.load("app/best_diabetes_prediction_model.pkl")
+    scaler = joblib.load("app/scaler.pkl")
+except ModuleNotFoundError as e:
+    raise ImportError(
+        f"Module missing while loading model or scaler: {e}. "
+        "Ensure compatible numpy and joblib versions are installed."
+    )
+except Exception as e:
+    raise RuntimeError(f"Error loading model or scaler: {e}")
+
+# Class names for the prediction
+class_names = np.array(["Non-Diabetic", "Diabetic"])
+
+# Define expected input data schema with constraints
 class PredictionRequest(BaseModel):
-    RIDAGEYR: confloat(ge=21.0, le=120.0)  # Example: Age from 0 to 120
-    RACE: conint(ge=1, le=4)  # Example: Race category, 1 to 5
-    EDUC: conint(ge=1, le=3)  # Example: Education level, 1 to 5
-    COUPLE: conint(ge=1, le=3)  # Example: 0 or 1 for couple status
-    TOTAL_ACCULTURATION_SCORE_v2: conint(ge=1, le=3)  # Example: Score from 0 to 100
-    FAT: conint(ge=1, le=3)  # Example: FAT score from 0 to 100
-    POVERTIES: conint(ge=0, le=1)  # Example: Poverty level, 0 to 5
-    HTN: conint(ge=0, le=1)  # Example: 0 or 1 for hypertension
-    RIAGENDR: conint(ge=1, le=2)  # Example: 1 or 2 for gender
-    SMOKER: conint(ge=0, le=1)  # Example: 0 or 1 for smoker status
+    Pregnancies: int = Field(..., ge=0, le=20, description="Number of pregnancies, typically between 0 and 20.")
+    Glucose: float = Field(..., ge=0, le=300, description="Glucose concentration (mg/dL), usually in the range of 0–300.")
+    BloodPressure: float = Field(..., ge=0, le=200, description="Blood pressure (mmHg), typically between 0 and 200.")
+    SkinThickness: float = Field(..., ge=0, le=100, description="Skin thickness (mm), generally between 0 and 100.")
+    Insulin: float = Field(..., ge=0, le=600, description="Insulin level (µU/mL), typically between 0 and 600.")
+    BMI: float = Field(..., ge=0.0, le=70.0, description="Body Mass Index (kg/m^2), usually in the range of 0–70.")
+    DiabetesPedigreeFunction: float = Field(..., ge=0.0, le=2.5, description="Diabetes pedigree function, typically between 0.0 and 2.5.")
+    Age: int = Field(..., ge=0, le=120, description="Age (years), typically between 0 and 120.")
 
 @app.get('/')
 def read_root():
-    return {'message': 'Early diabetes model API'}
+    return {'message': 'Diabetes model API'}
 
 @app.post('/predict')
 def predict(data: PredictionRequest):
@@ -42,7 +51,6 @@ def predict(data: PredictionRequest):
     Returns:
         dict: A dictionary containing the predicted class.
     """
-
     # Convert the input data to a DataFrame
     input_data = pd.DataFrame([data.dict()])
 
