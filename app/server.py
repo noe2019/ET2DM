@@ -1,26 +1,12 @@
 from fastapi import FastAPI, HTTPException
-from mangum import Mangum
 from pydantic import BaseModel, Field
 import joblib
 import numpy as np
 import pandas as pd
-<<<<<<< HEAD
-import os
-=======
-
-# Load the model and scaler
-model = joblib.load("app/adaboost_best_model.pkl")
-scaler = joblib.load("app/pipeline.pkl")  # Load scaler from a .pkl file
-
-# Class names for the prediction
-class_names = np.array(["No Parkinson disease", "Parkinson disease"])
->>>>>>> 2406caacd078552d864f1b331d73bd4512154235
 
 # Define the FastAPI app
 app = FastAPI()
-handler = Mangum(app)
 
-<<<<<<< HEAD
 # Load the model and scaler with fallback error handling
 try:
     model = joblib.load("app/best_diabetes_prediction_model.pkl")
@@ -50,34 +36,6 @@ class PredictionRequest(BaseModel):
 @app.get('/')
 def read_root():
     return {'message': 'Diabetes model API'}
-=======
-# Define expected input data schema with thresholds for validation
-class PredictionRequest(BaseModel):
-    UPDRS: confloat(ge=0, le=108)  # Unified Parkinson's Disease Rating Scale (0-108)
-    FunctionalAssessment: conint(ge=0, le=100)  # Percent functional capacity (0-100%)
-    Tremor: confloat(ge=0, le=4)  # Tremor severity score (0-4)
-    MoCA: conint(ge=0, le=30)  # Montreal Cognitive Assessment (0-30)
-    PosturalInstability: confloat(ge=0, le=4)  # Postural instability score (0-4)
-    Bradykinesia: confloat(ge=0, le=4)  # Bradykinesia severity score (0-4)
-    EducationLevel: conint(ge=0, le=20)  # Years of education (0-20)
-    Diabetes: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
-    Depression: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
-    Hypertension: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
-    Gender: conint(ge=0, le=1)  # Binary (0: Female, 1: Male)
-    BMI: confloat(ge=10, le=60)  # Body Mass Index (10-60)
-    Stroke: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
-    SleepDisorders: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
-    DiastolicBP: confloat(ge=40, le=120)  # Diastolic blood pressure (40-120 mmHg)
-    Constipation: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
-    Rigidity: confloat(ge=0, le=4)  # Rigidity severity score (0-4)
-    CholesterolHDL: confloat(ge=20, le=100)  # HDL cholesterol level (20-100 mg/dL)
-    FamilyHistoryParkinsons: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
-    TraumaticBrainInjury: conint(ge=0, le=1)  # Binary (0: No, 1: Yes)
-
-@app.get('/')
-def read_root():
-    return {'message': 'Parkinson Disease prediction API'}
->>>>>>> 2406caacd078552d864f1b331d73bd4512154235
 
 @app.post('/predict')
 def predict(data: PredictionRequest):
